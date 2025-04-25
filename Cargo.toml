@@ -1,0 +1,25 @@
+[package]
+name = "simple-api-demo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Web framework
+axum = "0.8.3"
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# SQLx with SQLite support
+sqlx = { version = "0.8.5", features = ["sqlite", "runtime-tokio", "macros"] }
+
+# Error handling
+thiserror = "2.0.12"
+
+# OpenAPI + Swagger UI
+utoipa = "5.3.1"
+utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
