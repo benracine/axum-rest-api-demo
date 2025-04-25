@@ -152,6 +152,7 @@ const DESCRIPTION: &str = r#"
 A lightweight REST API for managing users, built with:
 
 - [Axum](https://github.com/tokio-rs/axum) for the async web framework
+    - Memory safe, performant, zero-cost abstractions, ergonomic developer experience
 - [SQLx](https://github.com/launchbadge/sqlx) for compile-time safe SQL queries
 - [Utoipa](utoipa.github.io) for automatic OpenAPI documentation
 
@@ -207,6 +208,8 @@ async fn initialize_database() -> Result<SqlitePool, AppError> {
     ] {
         sqlx::query(sql).execute(&pool).await?;
     }
+
+    println!("Hit");
 
     Ok(pool)
 }
