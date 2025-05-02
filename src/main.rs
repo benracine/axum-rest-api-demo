@@ -6,6 +6,7 @@ use axum::{
     routing::get,
 }; // Web framework
 use serde::{Deserialize, Serialize}; // Serialization and deserialization
+// use serde_json::json; // JSON macro for examples
 use sqlx::{FromRow, SqlitePool, sqlite::SqlitePoolOptions}; // Database interaction
 use std::{net::SocketAddr, time::Duration};
 use thiserror::Error; // Error handling
@@ -23,6 +24,10 @@ use utoipa_swagger_ui::SwaggerUi; // Automatic OpenAPI documentation
 
 // User database model
 #[derive(Serialize, Deserialize, FromRow, ToSchema)]
+#[schema(example = json!({
+    "id": 1,
+    "name": "John Doe"
+}))]
 struct User {
     id: i32,
     name: String,
@@ -30,6 +35,9 @@ struct User {
 
 // User DTO (Data Transfer Object) model
 #[derive(Deserialize, ToSchema)]
+#[schema(example = json!({
+    "name": "Jane Smith"
+}))]
 struct NewUser {
     name: String,
 }
@@ -68,7 +76,15 @@ impl IntoResponse for AppError {
     get,
     path = "/users",
     tag = "User Service",
-    responses((status = 200, body = [User])),
+    responses(
+        (status = 200, body = [User], description = "List of users", example = json!([{
+            "id": 1,
+            "name": "John Doe"
+        }, {
+            "id": 2,
+            "name": "Jane Smith"
+        }])),
+    ),
     description = "Get all users"
 )]
 async fn get_users(State(pool): State<SqlitePool>) -> Result<Json<Vec<User>>, AppError> {
@@ -82,8 +98,16 @@ async fn get_users(State(pool): State<SqlitePool>) -> Result<Json<Vec<User>>, Ap
     get,
     path = "/users/{id}",
     tag = "User Service",
-    params(("id" = i32, Path)),
-    responses((status = 200, body = User), (status = 404)),
+    params(("id" = i32, Path, description = "User ID", example = 1)),
+    responses(
+        (status = 200, body = User, description = "User found", example = json!({
+            "id": 1,
+            "name": "John Doe"
+        })),
+        (status = 404, description = "User not found", example = json!({
+            "error": "Not found"
+        }))
+    ),
     description = "Get a user by ID"
 )]
 async fn get_user(
@@ -102,8 +126,22 @@ async fn get_user(
     post,
     path = "/users",
     tag = "User Service",
-    request_body = NewUser,
-    responses((status = 201, body = User)),
+    request_body(
+        content = NewUser,
+        description = "User to create",
+        example = json!({
+            "name": "Jane Smith"
+        })
+    ),
+    responses(
+        (status = 201, body = User, description = "User created", example = json!({
+            "id": 3,
+            "name": "Jane Smith"
+        })),
+        (status = 400, description = "Invalid input", example = json!({
+            "error": "Validation: Name must not be empty"
+        }))
+    ),
     description = "Create a new user"
 )]
 async fn create_user(
@@ -149,6 +187,8 @@ async fn fallback() -> impl IntoResponse {
 const DESCRIPTION: &str = r#"
 # Rust + Axum + SQLx + Utoipa Minimal REST API
 
+Proof that this works.
+
 A lightweight REST API for managing users, built with:
 
 - [Axum](https://github.com/tokio-rs/axum) for the async web framework
@@ -173,7 +213,7 @@ A lightweight REST API for managing users, built with:
 - **Clean architecture**:
     - Separation of routes, state, and error handling makes it Lambda- and container-friendly
 
-###  What’s Next
+###  What's Next
 
 - [ ] Add full integration tests for DB + API behavior using Schemathesis or similar against the public API and docs
 - [ ] Set up a CI/CD pipeline for building, testing, and deploying the app
@@ -209,8 +249,6 @@ async fn initialize_database() -> Result<SqlitePool, AppError> {
         sqlx::query(sql).execute(&pool).await?;
     }
 
-    println!("Hit");
-
     Ok(pool)
 }
 
@@ -237,7 +275,7 @@ async fn main() -> Result<(), AppError> {
     let pool = initialize_database().await?;
     let app = build_router(pool);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
     println!("Docs available at http://{}/docs", addr);
 
     let listener = tokio::net::TcpListener::bind(addr)

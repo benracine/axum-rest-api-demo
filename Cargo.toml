@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 
 # Web framework
-axum = "0.8.3"
+axum = "0.8.4"
 
 # Async runtime
 tokio = { version = "1", features = ["full"] }
@@ -31,4 +31,9 @@ tower = "0.5.2"
 # CORS, tracing, timeout
 tower-http = { version = "0.6.2", features = ["cors", "trace", "timeout"] }
 
-hyper = { version = "0.14", features = ["client", "runtime"] }
+# Structured logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+schemars = "0.8.22"
+
+# hyper = { version = "0.14", features = ["client", "runtime"] }
