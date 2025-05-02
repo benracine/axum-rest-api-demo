@@ -1,5 +1,14 @@
 # Rust + Axum + SQLx + Utoipa Minimal REST API
 
+## Quick Start
+
+- Git clone the repo
+- Move into the root
+- `cargo run`
+- visit `localhost:3000/docs` to see the interactive OpenAPI / Swagger UI
+
+## Summary
+
 A lightweight REST API for managing users, built with:
 
 - [Axum](https://github.com/tokio-rs/axum) for the async web framework
