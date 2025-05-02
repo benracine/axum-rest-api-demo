@@ -34,5 +34,7 @@ A lightweight REST API for managing users, built with:
 
 ###  What’s Next
 
+- [ ] Add schemars to help create a connection between the structs and the database structure
 - [ ] Add full integration tests for DB + API behavior using Schemathesis or similar against the public API and docs
 - [ ] Set up a CI/CD pipeline for building, testing, and deploying the app
+
